@@ -94,6 +94,22 @@ async def subdir_repodatadatabz2_pkgs(subdir):
     )
 
 
+@app.get("/{subdir}/current_repodata.json")
+async def subdir_repodatadata_curr(subdir):
+    return RedirectResponse(
+        "https://github.com/regro/repodata/releases/latest/download/"
+        f"repodata_{subdir}_main.json"
+    )
+
+
+@app.get("/{subdir}/current_repodata.json.bz2")
+async def subdir_repodatadatabz2_curr(subdir):
+    return RedirectResponse(
+        "https://github.com/regro/repodata/releases/latest/download/"
+        f"repodata_{subdir}_main.json.bz2"
+    )
+
+
 @app.get("/{subdir}/{pkg}")
 async def subdir_pkg(subdir, pkg):
     subdir_pkg = os.path.join(subdir, pkg)
