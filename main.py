@@ -1,6 +1,7 @@
 import os
 import requests
 import threading
+import gc
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -37,6 +38,7 @@ def _update_links():
         "https://github.com/regro/repodata/releases/latest/download/links.json"
     ).json()
     LINKS = new_links
+    gc.collect()
 
 
 _stop_update_links = _update_links()
@@ -44,11 +46,16 @@ _stop_update_links = _update_links()
 app = FastAPI()
 
 
+@app.get("/")
+async def root():
+    return {"message": "this is the index!"}
+
+
 ################################################################################
 # labels
 ################################################################################
 
-@app.get("/label/{label}")
+@app.get("/conda-forge-sparta/label/{label}")
 async def root_label(label):
     return {"message": "this is the index!"}
     # return RedirectResponse(
@@ -56,7 +63,7 @@ async def root_label(label):
     # )
 
 
-@app.get("/label/{label}/channeldata.json")
+@app.get("/conda-forge-sparta/label/{label}/channeldata.json")
 async def channeldata_label(label):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -64,7 +71,7 @@ async def channeldata_label(label):
     )
 
 
-@app.get("/label/{label}/{subdir}/")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/")
 async def subdir_root_label(label, subdir):
     return {"message": "this is the index!"}
     # return RedirectResponse(
@@ -72,7 +79,7 @@ async def subdir_root_label(label, subdir):
     # )
 
 
-@app.get("/label/{label}/{subdir}/repodata.json")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/repodata.json")
 async def subdir_repodatadata_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -80,7 +87,7 @@ async def subdir_repodatadata_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/repodata.json.bz2")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/repodata.json.bz2")
 async def subdir_repodatadatabz2_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -88,7 +95,7 @@ async def subdir_repodatadatabz2_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/repodata_from_packages.json")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/repodata_from_packages.json")
 async def subdir_repodatadata_pkgs_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -96,7 +103,7 @@ async def subdir_repodatadata_pkgs_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/repodata_from_packages.json.bz2")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/repodata_from_packages.json.bz2")
 async def subdir_repodatadatabz2_pkgs_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -104,7 +111,7 @@ async def subdir_repodatadatabz2_pkgs_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/current_repodata.json")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/current_repodata.json")
 async def subdir_repodatadata_curr_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -112,7 +119,7 @@ async def subdir_repodatadata_curr_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/current_repodata.json.bz2")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/current_repodata.json.bz2")
 async def subdir_repodatadatabz2_curr_label(label, subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -120,7 +127,7 @@ async def subdir_repodatadatabz2_curr_label(label, subdir):
     )
 
 
-@app.get("/label/{label}/{subdir}/{pkg}")
+@app.get("/conda-forge-sparta/label/{label}/{subdir}/{pkg}")
 async def subdir_pkg_label(label, subdir, pkg):
     subdir_pkg = os.path.join(subdir, pkg)
     url = LINKS[label].get(subdir_pkg, None)
@@ -136,13 +143,13 @@ async def subdir_pkg_label(label, subdir, pkg):
 ################################################################################
 
 
-@app.get("/")
-async def root():
+@app.get("/conda-forge-sparta/")
+async def root_main():
     return {"message": "this is the index!"}
     # return RedirectResponse("https://regro.github.io/repodata/label/main/index.html")
 
 
-@app.get("/channeldata.json")
+@app.get("/conda-forge-sparta/channeldata.json")
 async def channeldata():
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -150,7 +157,7 @@ async def channeldata():
     )
 
 
-@app.get("/{subdir}/")
+@app.get("/conda-forge-sparta/{subdir}/")
 async def subdir_root(subdir):
     return {"message": "this is the index!"}
     # return RedirectResponse(
@@ -158,7 +165,7 @@ async def subdir_root(subdir):
     # )
 
 
-@app.get("/{subdir}/repodata.json")
+@app.get("/conda-forge-sparta/{subdir}/repodata.json")
 async def subdir_repodatadata(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -166,7 +173,7 @@ async def subdir_repodatadata(subdir):
     )
 
 
-@app.get("/{subdir}/repodata.json.bz2")
+@app.get("/conda-forge-sparta/{subdir}/repodata.json.bz2")
 async def subdir_repodatadatabz2(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -174,7 +181,7 @@ async def subdir_repodatadatabz2(subdir):
     )
 
 
-@app.get("/{subdir}/repodata_from_packages.json")
+@app.get("/conda-forge-sparta/{subdir}/repodata_from_packages.json")
 async def subdir_repodatadata_pkgs(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -182,7 +189,7 @@ async def subdir_repodatadata_pkgs(subdir):
     )
 
 
-@app.get("/{subdir}/repodata_from_packages.json.bz2")
+@app.get("/conda-forge-sparta/{subdir}/repodata_from_packages.json.bz2")
 async def subdir_repodatadatabz2_pkgs(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -190,7 +197,7 @@ async def subdir_repodatadatabz2_pkgs(subdir):
     )
 
 
-@app.get("/{subdir}/current_repodata.json")
+@app.get("/conda-forge-sparta/{subdir}/current_repodata.json")
 async def subdir_repodatadata_curr(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -198,7 +205,7 @@ async def subdir_repodatadata_curr(subdir):
     )
 
 
-@app.get("/{subdir}/current_repodata.json.bz2")
+@app.get("/conda-forge-sparta/{subdir}/current_repodata.json.bz2")
 async def subdir_repodatadatabz2_curr(subdir):
     return RedirectResponse(
         "https://github.com/regro/repodata/releases/latest/download/"
@@ -206,7 +213,7 @@ async def subdir_repodatadatabz2_curr(subdir):
     )
 
 
-@app.get("/{subdir}/{pkg}")
+@app.get("/conda-forge-sparta/{subdir}/{pkg}")
 async def subdir_pkg(subdir, pkg):
     subdir_pkg = os.path.join(subdir, pkg)
     url = LINKS["main"].get(subdir_pkg, None)
